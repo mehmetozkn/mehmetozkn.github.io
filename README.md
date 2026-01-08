@@ -1,1 +1,1 @@
-# mehmetozkn.github.io
+google.com, pub-1785774348832373, DIRECT, f08c47fec0942fa0
