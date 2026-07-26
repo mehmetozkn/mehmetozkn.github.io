@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["8N942344B3.com.mehmetozkan.pingo"],
+        "components": [
+          { "/": "/Pingo/*" }
+        ]
+      }
+    ]
+  }
+}
