@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pingo Kart</title>
+  <meta name="apple-itunes-app" content="app-id=REPLACE_WITH_APPSTORE_ID" />
+  <style>
+    :root {
+      --bg-top: #1a0b2e;
+      --bg-bottom: #16121c;
+      --card: #3a3f4b;
+      --card-dark: #20242e;
+      --muted: #9aa0ab;
+      --pink: #fd267a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+      color: #fff; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
+    }
+    .wrap { width: 100%; max-width: 420px; }
+    .card {
+      border-radius: 28px; padding: 30px 24px;
+      background: linear-gradient(135deg, var(--card), var(--card-dark));
+      box-shadow: 0 24px 60px rgba(0,0,0,.55);
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .card::after {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(circle at top right, rgba(255,255,255,.28), transparent 55%);
+      pointer-events: none;
+    }
+    .avatar {
+      width: 84px; height: 84px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; font-weight: 800; margin: 0 auto 14px;
+    }
+    .name { font-size: 22px; font-weight: 800; }
+    .title { font-size: 13px; opacity: .9; margin-top: 4px; }
+    .pill {
+      display: inline-block; margin-top: 12px; padding: 6px 14px;
+      background: rgba(255,255,255,.22); border-radius: 999px; font-size: 13px; font-weight: 600;
+    }
+    .links { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .link {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px; padding: 13px 16px; text-decoration: none; color: #fff;
+      font-size: 15px; font-weight: 600; transition: background .15s;
+    }
+    .link:active { background: rgba(255,255,255,.22); }
+    .link .plat { font-weight: 700; }
+    .link .val { color: rgba(255,255,255,.75); font-weight: 500; margin-left: auto; font-size: 13px; }
+    .cta {
+      margin-top: 26px; display: block; text-align: center; text-decoration: none;
+      background: linear-gradient(135deg, #fd267a, #ff5864); color: #fff;
+      font-size: 16px; font-weight: 700; padding: 16px; border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(253,38,122,.4);
+    }
+    .foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; }
+    .state { text-align: center; padding: 40px 10px; color: var(--muted); }
+    .state .big { font-size: 44px; margin-bottom: 12px; }
+    .spinner {
+      width: 34px; height: 34px; border: 3px solid rgba(255,255,255,.2);
+      border-top-color: #fff; border-radius: 50%; margin: 0 auto 14px;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="root">
+    <div class="state"><div class="spinner"></div>Kart yükleniyor…</div>
+  </div>
+
+  <script>
+    // ---- Yapılandırma -------------------------------------------------------
+    var FIREBASE_PROJECT_ID = "pingoqr-6653a";
+    // TODO: Uygulama App Store'da yayınlanınca gerçek App Store linkiyle değiştir:
+    //   https://apps.apple.com/app/id<APP_ID>
+    var APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
+
+    // ---- Kart kimliğini al (?id=... veya /c/<id>) ---------------------------
+    function getCardId() {
+      var p = new URLSearchParams(location.search);
+      var id = p.get("id");
+      if (id) return id;
+      var m = location.pathname.match(/\/c\/([^\/?#]+)/);
+      return m ? decodeURIComponent(m[1]) : null;
+    }
+
+    // ---- Kind → gradyan & emoji --------------------------------------------
+    var KIND = {
+      social:  { grad: ["#ff5864", "#ff7854"], emoji: "🎉", name: "Sosyal" },
+      flirt:   { grad: ["#fd267a", "#ff5864"], emoji: "💘", name: "Flört" },
+      work:    { grad: ["#3a3f4b", "#20242e"], emoji: "💼", name: "İş" },
+      event:   { grad: ["#5a5560", "#302c38"], emoji: "🎫", name: "Etkinlik" },
+      gaming:  { grad: ["#4a4560", "#26222f"], emoji: "🎮", name: "Oyun" }
+    };
+
+    var PLAT_NAME = {
+      whatsapp:"WhatsApp", instagram:"Instagram", x:"X", tiktok:"TikTok",
+      linkedin:"LinkedIn", spotify:"Spotify", github:"GitHub", telegram:"Telegram",
+      snapchat:"Snapchat", facebook:"Facebook", discord:"Discord", steam:"Steam",
+      twitch:"Twitch", website:"Website", email:"E-posta", phone:"Telefon"
+    };
+
+    function handleOf(v){ return (v||"").replace(/^[@\s]+|[@\s]+$/g, ""); }
+    function digitsOf(v){ return (v||"").replace(/\D/g, ""); }
+
+    function urlFor(platform, value) {
+      var h = handleOf(value), d = digitsOf(value);
+      switch (platform) {
+        case "instagram": return "https://instagram.com/" + h;
+        case "x": return "https://x.com/" + h;
+        case "tiktok": return "https://tiktok.com/@" + h;
+        case "linkedin": return value.charAt(0) === "/" ? "https://linkedin.com" + value : "https://linkedin.com/in/" + h;
+        case "github": return "https://github.com/" + h;
+        case "spotify": return "https://open.spotify.com/search/" + encodeURIComponent(h);
+        case "telegram": return "https://t.me/" + h;
+        case "snapchat": return "https://snapchat.com/add/" + h;
+        case "facebook": return "https://facebook.com/" + h;
+        case "discord": return "https://discord.com";
+        case "steam": return "https://steamcommunity.com/id/" + h;
+        case "twitch": return "https://twitch.tv/" + h;
+        case "whatsapp": return d ? "https://wa.me/" + d : "https://wa.me";
+        case "website": return value.indexOf("http") === 0 ? value : "https://" + value;
+        case "email": return "mailto:" + value;
+        case "phone": return "tel:" + d;
+        default: return "#";
+      }
+    }
+
+    // ---- Firestore REST alanlarını çöz -------------------------------------
+    function fval(f) {
+      if (!f) return null;
+      if ("stringValue" in f) return f.stringValue;
+      if ("booleanValue" in f) return f.booleanValue;
+      if ("integerValue" in f) return parseInt(f.integerValue, 10);
+      if ("arrayValue" in f) return (f.arrayValue.values || []).map(fval);
+      if ("mapValue" in f) {
+        var o = {}, mf = f.mapValue.fields || {};
+        for (var k in mf) o[k] = fval(mf[k]);
+        return o;
+      }
+      if ("nullValue" in f) return null;
+      return null;
+    }
+
+    function initials(name) {
+      return (name || "").split(" ").filter(Boolean).slice(0, 2)
+        .map(function (p) { return p.charAt(0); }).join("").toUpperCase();
+    }
+
+    function esc(s) {
+      return (s || "").replace(/[&<>"']/g, function (c) {
+        return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+      });
+    }
+
+    function downloadBtn() {
+      return '<a class="cta" href="' + APP_STORE_URL + '">Pingo\'yu App Store\'dan indir</a>';
+    }
+
+    function renderCard(card) {
+      var kind = KIND[card.kind] || KIND.social;
+      var bg = card.cardColorHex
+        ? "linear-gradient(135deg," + card.cardColorHex + "," + card.cardColorHex + ")"
+        : "linear-gradient(135deg," + kind.grad[0] + "," + kind.grad[1] + ")";
+
+      var accounts = (card.accounts || []).filter(function (a) { return a && a.isVisible !== false; });
+      var links = accounts.map(function (a) {
+        var name = PLAT_NAME[a.platform] || a.platform;
+        return '<a class="link" href="' + esc(urlFor(a.platform, a.value)) + '" target="_blank" rel="noopener">' +
+               '<span class="plat">' + esc(name) + '</span>' +
+               '<span class="val">' + esc(a.value) + '</span></a>';
+      }).join("");
+
+      document.getElementById("root").innerHTML =
+        '<div class="card" style="background:' + bg + '">' +
+          '<div class="avatar">' + esc(initials(card.name)) + '</div>' +
+          '<div class="name">' + esc(card.name || "Pingo") + '</div>' +
+          (card.title ? '<div class="title">' + esc(card.title) + '</div>' : '') +
+          '<div class="pill">' + kind.emoji + ' ' + esc(kind.name) + '</div>' +
+          '<div class="links">' + links + '</div>' +
+        '</div>' +
+        downloadBtn() +
+        '<div class="foot">Made with Pingo</div>';
+    }
+
+    function renderMissing() {
+      document.getElementById("root").innerHTML =
+        '<div class="state"><div class="big">🔍</div>Bu kart bulunamadı veya artık paylaşılmıyor.</div>' +
+        downloadBtn();
+    }
+
+    // ---- Getir --------------------------------------------------------------
+    var id = getCardId();
+    if (!id) {
+      renderMissing();
+    } else {
+      var url = "https://firestore.googleapis.com/v1/projects/" + FIREBASE_PROJECT_ID +
+                "/databases/(default)/documents/sharedCards/" + encodeURIComponent(id);
+      fetch(url)
+        .then(function (r) { if (!r.ok) throw new Error("not found"); return r.json(); })
+        .then(function (doc) {
+          var f = doc.fields || {};
+          renderCard({
+            name: fval(f.name),
+            title: fval(f.title),
+            kind: fval(f.kind),
+            cardColorHex: fval(f.cardColorHex),
+            accounts: fval(f.accounts) || []
+          });
+        })
+        .catch(function () { renderMissing(); });
+    }
+  </script>
+</body>
+</html>

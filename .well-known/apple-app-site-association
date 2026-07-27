@@ -4,9 +4,18 @@
       {
         "appIDs": ["8N942344B3.com.mehmetozkan.pingo"],
         "components": [
-          { "/": "/Pingo/*" }
+          {
+            "/": "/c/*",
+            "comment": "Pingo paylasilan kart linkleri (uygulama kuruluysa acar)"
+          },
+          {
+            "/": "/Pingo/*"
+          }
         ]
       }
     ]
+  },
+  "webcredentials": {
+    "apps": ["8N942344B3.com.mehmetozkan.pingo"]
   }
 }
