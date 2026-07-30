@@ -66,9 +66,20 @@
       font-size: 16px; font-weight: 700; padding: 16px; border-radius: 16px;
       box-shadow: 0 12px 30px rgba(253,38,122,.4);
     }
+    /* Yeniden dene butonu .cta görünümünü <button> ile paylaşır. */
+    button.cta { width: 100%; border: 0; font-family: inherit; cursor: pointer; }
+    .ghost {
+      margin-top: 12px; display: block; text-align: center; text-decoration: none;
+      background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.16);
+      color: #fff; font-size: 15px; font-weight: 600; padding: 14px; border-radius: 16px;
+    }
     .foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; }
     .state { text-align: center; padding: 40px 10px; color: var(--muted); }
     .state .big { font-size: 44px; margin-bottom: 12px; }
+    .dbg {
+      margin-top: 14px; font-size: 11px; line-height: 1.5; color: #6b7280;
+      word-break: break-all; text-align: left;
+    }
     .spinner {
       width: 34px; height: 34px; border: 3px solid rgba(255,255,255,.2);
       border-top-color: #fff; border-radius: 50%; margin: 0 auto 14px;
@@ -89,10 +100,28 @@
     // Firestore'daki herkese açık `sharedCards/{id}` dokümanından REST ile
     // okunur (oturum gerekmez; kural: allow get: if true).
     // Kaynak repo: Pingo/web/c/index.html — mehmetozkn.github.io'ya kopyalanır.
+    //
+    // ÖNEMLİ — "kart bulunamadı" hatasının iki gerçek nedeni ve çözümü:
+    //  1) Safari HTTP ÖNBELLEĞİ: Firestore'un 404 yanıtında `cache-control`
+    //     YOKTUR, 404 ise sezgisel olarak önbelleğe alınabilir bir durumdur.
+    //     Link, kart dokümanı henüz yayınlanmadan bir kez açıldıysa Safari o
+    //     404'ü saklar ve kart sonradan yayınlansa bile sayfa "bulunamadı"
+    //     göstermeye devam eder. Uygulamalı telefonda bu yaşanmaz; native SDK
+    //     HTTP önbelleği kullanmaz. Çözüm: `cache: "no-store"` + her istekte
+    //     değişen cache-bust parametresi.
+    //  2) HER HATA "bulunamadı" sayılıyordu: ağ kopması, 5xx, hatta çizim
+    //     sırasındaki bir istisna dahi aynı mesajı gösteriyordu (tek `.catch`
+    //     hem fetch'i hem renderCard'ı kapsıyordu) ve tekrar deneme yoktu.
+    //     Çözüm: 404 → "bulunamadı"; ağ/5xx → yeniden dene (backoff) ve
+    //     ayrı "bağlantı" durumu + "Tekrar dene" butonu.
+    // Teşhis için: linkin sonuna `&debug=1` ekleyince gerçek hata görünür.
     // -------------------------------------------------------------------------
 
     var FIREBASE_PROJECT_ID = "pingoqr-6653a";
     var APP_STORE_URL = "https://apps.apple.com/app/id6793897568";
+    var MAX_ATTEMPTS = 3;   // ağ/5xx hatalarında toplam deneme sayısı
+
+    var DEBUG = /[?&]debug=1(?:&|$)/.test(location.search);
 
     // ---- Dil ----------------------------------------------------------------
     var isEN = (navigator.language || "tr").toLowerCase().indexOf("tr") !== 0;
@@ -100,19 +129,47 @@
       loading:  isEN ? "Loading card…"  : "Kart yükleniyor…",
       missing:  isEN ? "This card was not found or is no longer shared."
                      : "Bu kart bulunamadı veya artık paylaşılmıyor.",
+      offline:  isEN ? "Couldn’t reach the card. Check your connection and try again."
+                     : "Karta ulaşılamadı. Bağlantını kontrol edip tekrar dene.",
+      retry:    isEN ? "Try again" : "Tekrar dene",
       download: isEN ? "Get Pingo on the App Store" : "Pingo'yu App Store'dan indir",
       made:     isEN ? "Made with Pingo" : "Pingo ile oluşturuldu"
     };
     document.documentElement.lang = isEN ? "en" : "tr";
-    document.getElementById("loading").textContent = T.loading;
 
-    // ---- Kart kimliğini al (?id=... veya /c/<id>) ---------------------------
+    // ---- Kart kimliğini al (?id=... , #id=... veya /c/<id>) -----------------
     function getCardId() {
-      var p = new URLSearchParams(location.search);
-      var id = p.get("id");
-      if (id) return id;
-      var m = location.pathname.match(/\/c\/([^\/?#]+)/);
-      return m ? decodeURIComponent(m[1]) : null;
+      var raw = new URLSearchParams(location.search).get("id");
+
+      if (!raw && location.hash) {
+        raw = new URLSearchParams(location.hash.replace(/^#/, "?")).get("id");
+      }
+      if (!raw) {
+        var m = location.pathname.match(/\/c\/([^\/?#]+)/);
+        // `/c/index.html` bir kart id'si değildir; doküman olarak aranmasın.
+        if (m && m[1].toLowerCase() !== "index.html") {
+          try { raw = decodeURIComponent(m[1]); } catch (e) { raw = m[1]; }
+        }
+      }
+      return normalizeId(raw);
+    }
+
+    /// Linkin kopyala/yapıştır ile bozulmuş hâllerini toparlar: baştaki/sondaki
+    /// boşluk, tırnak, parantez ve noktalama kart id'sinin parçası değildir.
+    function normalizeId(v) {
+      if (v == null) return null;
+      var s = String(v).trim().replace(/^["'<(\s]+/, "").replace(/["'>)\s.,;:!]+$/, "");
+      return s || null;
+    }
+
+    /// 404 alınırsa denenecek id varyantları. iOS `uuidString` BÜYÜK harf üretir;
+    /// link bir yerde küçültülmüşse (Firestore doküman id'leri harf duyarlıdır)
+    /// kart yine bulunsun.
+    function idVariants(id) {
+      var out = [id], up = id.toUpperCase(), lo = id.toLowerCase();
+      if (up !== id) out.push(up);
+      if (lo !== id) out.push(lo);
+      return out;
     }
 
     // ---- Kind → gradyan & ad -------------------------------------------------
@@ -132,16 +189,19 @@
       phone: isEN ? "Phone" : "Telefon"
     };
 
-    function handleOf(v){ return (v||"").replace(/^[@\s]+|[@\s]+$/g, ""); }
-    function digitsOf(v){ return (v||"").replace(/\D/g, ""); }
+    function handleOf(v){ return str(v).replace(/^[@\s]+|[@\s]+$/g, ""); }
+    function digitsOf(v){ return str(v).replace(/\D/g, ""); }
+    /// Firestore alanları beklenmedik tipte (sayı/null) gelse de string
+    /// metodları patlamasın — patlarsa kart "bulunamadı" gibi görünürdü.
+    function str(v){ return v == null ? "" : String(v); }
 
     function urlFor(platform, value) {
-      var h = handleOf(value), d = digitsOf(value);
+      var v = str(value), h = handleOf(v), d = digitsOf(v);
       switch (platform) {
         case "instagram": return "https://instagram.com/" + h;
         case "x": return "https://x.com/" + h;
         case "tiktok": return "https://tiktok.com/@" + h;
-        case "linkedin": return value.charAt(0) === "/" ? "https://linkedin.com" + value : "https://linkedin.com/in/" + h;
+        case "linkedin": return v.charAt(0) === "/" ? "https://linkedin.com" + v : "https://linkedin.com/in/" + h;
         case "github": return "https://github.com/" + h;
         case "spotify": return "https://open.spotify.com/search/" + encodeURIComponent(h);
         case "telegram": return "https://t.me/" + h;
@@ -151,8 +211,8 @@
         case "steam": return "https://steamcommunity.com/id/" + h;
         case "twitch": return "https://twitch.tv/" + h;
         case "whatsapp": return d ? "https://wa.me/" + d : "https://wa.me";
-        case "website": return value.indexOf("http") === 0 ? value : "https://" + value;
-        case "email": return "mailto:" + value;
+        case "website": return v.indexOf("http") === 0 ? v : "https://" + v;
+        case "email": return "mailto:" + v;
         case "phone": return "tel:" + d;
         default: return "#";
       }
@@ -174,19 +234,38 @@
       return null;
     }
 
+    function cardFrom(doc) {
+      var f = (doc && doc.fields) || {};
+      return {
+        name: fval(f.name),
+        title: fval(f.title),
+        kind: fval(f.kind),
+        cardColorHex: fval(f.cardColorHex),
+        accounts: fval(f.accounts) || []
+      };
+    }
+
     function initials(name) {
-      return (name || "").split(" ").filter(Boolean).slice(0, 2)
+      return str(name).split(" ").filter(Boolean).slice(0, 2)
         .map(function (p) { return p.charAt(0); }).join("").toUpperCase();
     }
 
     function esc(s) {
-      return (s || "").replace(/[&<>"']/g, function (c) {
+      return str(s).replace(/[&<>"']/g, function (c) {
         return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
       });
     }
 
     function downloadBtn() {
       return '<a class="cta" href="' + APP_STORE_URL + '">' + T.download + '</a>';
+    }
+
+    function root() { return document.getElementById("root"); }
+
+    // ---- Durumlar -----------------------------------------------------------
+    function renderLoading() {
+      root().innerHTML =
+        '<div class="state"><div class="spinner"></div><span>' + esc(T.loading) + '</span></div>';
     }
 
     function renderCard(card) {
@@ -207,7 +286,7 @@
 
       if (card.name) document.title = card.name + " · Pingo";
 
-      document.getElementById("root").innerHTML =
+      root().innerHTML =
         '<div class="card" style="background:' + bg + '">' +
           '<div class="avatar">' + esc(initials(card.name)) + '</div>' +
           '<div class="name">' + esc(card.name || "Pingo") + '</div>' +
@@ -219,33 +298,107 @@
         '<div class="foot">' + T.made + '</div>';
     }
 
-    function renderMissing() {
-      document.getElementById("root").innerHTML =
-        '<div class="state"><div class="big">🔍</div>' + T.missing + '</div>' +
+    /// Kart gerçekten yok (404): yayınlanmamış, silinmiş veya id hatalı.
+    function renderMissing(detail) {
+      root().innerHTML =
+        '<div class="state"><div class="big">🔍</div>' + T.missing + dbg(detail) + '</div>' +
         downloadBtn();
     }
 
-    // ---- Getir --------------------------------------------------------------
-    var id = getCardId();
-    if (!id) {
-      renderMissing();
-    } else {
-      var url = "https://firestore.googleapis.com/v1/projects/" + FIREBASE_PROJECT_ID +
-                "/databases/(default)/documents/sharedCards/" + encodeURIComponent(id);
-      fetch(url)
-        .then(function (r) { if (!r.ok) throw new Error("not found"); return r.json(); })
-        .then(function (doc) {
-          var f = doc.fields || {};
-          renderCard({
-            name: fval(f.name),
-            title: fval(f.title),
-            kind: fval(f.kind),
-            cardColorHex: fval(f.cardColorHex),
-            accounts: fval(f.accounts) || []
-          });
-        })
-        .catch(function () { renderMissing(); });
+    /// Karta ULAŞILAMADI (ağ/5xx/çizim hatası). 404'ten AYRI tutulur: kart
+    /// silinmiş değil, bu yüzden kullanıcıya tekrar deneme imkânı verilir.
+    function renderError(detail) {
+      root().innerHTML =
+        '<div class="state"><div class="big">📶</div>' + T.offline + dbg(detail) + '</div>' +
+        '<button class="cta" id="retry" type="button">' + T.retry + '</button>' +
+        '<a class="ghost" href="' + APP_STORE_URL + '">' + T.download + '</a>' +
+        '<div class="foot">' + T.made + '</div>';
+      document.getElementById("retry").addEventListener("click", load);
     }
+
+    function dbg(detail) {
+      if (!DEBUG || !detail) return "";
+      return '<div class="dbg">' + esc(detail) + '</div>';
+    }
+
+    // ---- Getir --------------------------------------------------------------
+    var bust = 0;
+
+    function docURL(id) {
+      bust++;
+      // Cache-bust: Safari'nin sakladığı ESKİ 404 yanıtı bir daha kullanılmasın.
+      return "https://firestore.googleapis.com/v1/projects/" + FIREBASE_PROJECT_ID +
+             "/databases/(default)/documents/sharedCards/" + encodeURIComponent(id) +
+             "?_=" + bust + "." + (new Date()).getTime();
+    }
+
+    function wait(ms) {
+      return new Promise(function (res) { setTimeout(res, ms); });
+    }
+
+    /// Tek bir id için dokümanı çeker; geçici hatalarda yeniden dener.
+    /// Döner: {status:"ok",doc} | {status:"notfound"} | {status:"error",detail}
+    function fetchDoc(id) {
+      var attempt = 0;
+
+      function once() {
+        attempt++;
+        // no-store: hem eski 404'ü yok sayar hem de yanıtı önbelleğe yazmaz.
+        return fetch(docURL(id), { cache: "no-store", credentials: "omit" })
+          .then(function (r) {
+            if (r.status === 404) return { status: "notfound", detail: "HTTP 404 (" + id + ")" };
+            if (!r.ok) {
+              // 5xx / 429 geçici olabilir → tekrar dene. 403 kalıcıdır (kural hatası).
+              if (attempt < MAX_ATTEMPTS && (r.status >= 500 || r.status === 429)) {
+                return wait(400 * attempt).then(once);
+              }
+              return { status: "error", detail: "HTTP " + r.status + " (" + id + ")" };
+            }
+            return r.json().then(function (doc) { return { status: "ok", doc: doc }; });
+          })
+          .catch(function (e) {
+            // Ağ hatası: offline, DNS, TLS, iptal, bozuk JSON → tekrar dene.
+            if (attempt < MAX_ATTEMPTS) return wait(400 * attempt).then(once);
+            return { status: "error", detail: (e && e.message) || "network" };
+          });
+      }
+
+      return once();
+    }
+
+    function load() {
+      var id = getCardId();
+      if (!id) { renderMissing("id yok"); return; }
+
+      renderLoading();
+
+      // 404 hâlinde harf varyantlarını da dene (bkz. idVariants).
+      var variants = idVariants(id), i = 0, lastMissing = null;
+
+      function next() {
+        return fetchDoc(variants[i]).then(function (res) {
+          if (res.status === "notfound") {
+            lastMissing = res.detail;
+            if (++i < variants.length) return next();
+          }
+          return res;
+        });
+      }
+
+      next().then(function (res) {
+        if (res.status === "ok") {
+          // Çizim hatası ASLA "kart bulunamadı" gibi görünmesin.
+          try { renderCard(cardFrom(res.doc)); }
+          catch (e) { renderError("render: " + ((e && e.message) || e)); }
+        } else if (res.status === "notfound") {
+          renderMissing(lastMissing);
+        } else {
+          renderError(res.detail);
+        }
+      });
+    }
+
+    load();
   </script>
 </body>
 </html>
