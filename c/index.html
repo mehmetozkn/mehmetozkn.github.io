@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Pingo Kart</title>
-  <meta name="apple-itunes-app" content="app-id=REPLACE_WITH_APPSTORE_ID" />
+  <!-- Uygulama kuruluysa Safari üstte "Aç" bannerı gösterir. -->
+  <meta name="apple-itunes-app" content="app-id=6793897568" />
+  <meta name="robots" content="noindex" />
   <style>
     :root {
       --bg-top: #1a0b2e;
@@ -55,6 +57,8 @@
     }
     .link:active { background: rgba(255,255,255,.22); }
     .link .plat { font-weight: 700; }
+    .link .sub { color: rgba(255,255,255,.6); font-size: 11px; font-weight: 500; }
+    .link .col { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
     .link .val { color: rgba(255,255,255,.75); font-weight: 500; margin-left: auto; font-size: 13px; }
     .cta {
       margin-top: 26px; display: block; text-align: center; text-decoration: none;
@@ -75,15 +79,32 @@
 </head>
 <body>
   <div class="wrap" id="root">
-    <div class="state"><div class="spinner"></div>Kart yükleniyor…</div>
+    <div class="state"><div class="spinner"></div><span id="loading">Kart yükleniyor…</span></div>
   </div>
 
   <script>
-    // ---- Yapılandırma -------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // Pingo — paylaşılan kartın web karşılığı.
+    // Uygulama KURULU DEĞİLSE kamera QR'ı bu sayfayı açar. Kart verisi
+    // Firestore'daki herkese açık `sharedCards/{id}` dokümanından REST ile
+    // okunur (oturum gerekmez; kural: allow get: if true).
+    // Kaynak repo: Pingo/web/c/index.html — mehmetozkn.github.io'ya kopyalanır.
+    // -------------------------------------------------------------------------
+
     var FIREBASE_PROJECT_ID = "pingoqr-6653a";
-    // TODO: Uygulama App Store'da yayınlanınca gerçek App Store linkiyle değiştir:
-    //   https://apps.apple.com/app/id<APP_ID>
-    var APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
+    var APP_STORE_URL = "https://apps.apple.com/app/id6793897568";
+
+    // ---- Dil ----------------------------------------------------------------
+    var isEN = (navigator.language || "tr").toLowerCase().indexOf("tr") !== 0;
+    var T = {
+      loading:  isEN ? "Loading card…"  : "Kart yükleniyor…",
+      missing:  isEN ? "This card was not found or is no longer shared."
+                     : "Bu kart bulunamadı veya artık paylaşılmıyor.",
+      download: isEN ? "Get Pingo on the App Store" : "Pingo'yu App Store'dan indir",
+      made:     isEN ? "Made with Pingo" : "Pingo ile oluşturuldu"
+    };
+    document.documentElement.lang = isEN ? "en" : "tr";
+    document.getElementById("loading").textContent = T.loading;
 
     // ---- Kart kimliğini al (?id=... veya /c/<id>) ---------------------------
     function getCardId() {
@@ -94,20 +115,21 @@
       return m ? decodeURIComponent(m[1]) : null;
     }
 
-    // ---- Kind → gradyan & emoji --------------------------------------------
+    // ---- Kind → gradyan & ad -------------------------------------------------
     var KIND = {
-      social:  { grad: ["#ff5864", "#ff7854"], emoji: "🎉", name: "Sosyal" },
-      flirt:   { grad: ["#fd267a", "#ff5864"], emoji: "💘", name: "Flört" },
-      work:    { grad: ["#3a3f4b", "#20242e"], emoji: "💼", name: "İş" },
-      event:   { grad: ["#5a5560", "#302c38"], emoji: "🎫", name: "Etkinlik" },
-      gaming:  { grad: ["#4a4560", "#26222f"], emoji: "🎮", name: "Oyun" }
+      social:  { grad: ["#ff5864", "#ff7854"], emoji: "🎉", tr: "Sosyal",   en: "Social" },
+      flirt:   { grad: ["#fd267a", "#ff5864"], emoji: "💘", tr: "Flört",    en: "Flirt" },
+      work:    { grad: ["#3a3f4b", "#20242e"], emoji: "💼", tr: "İş",       en: "Work" },
+      event:   { grad: ["#5a5560", "#302c38"], emoji: "🎫", tr: "Etkinlik", en: "Event" },
+      gaming:  { grad: ["#4a4560", "#26222f"], emoji: "🎮", tr: "Oyun",     en: "Gaming" }
     };
 
     var PLAT_NAME = {
       whatsapp:"WhatsApp", instagram:"Instagram", x:"X", tiktok:"TikTok",
       linkedin:"LinkedIn", spotify:"Spotify", github:"GitHub", telegram:"Telegram",
       snapchat:"Snapchat", facebook:"Facebook", discord:"Discord", steam:"Steam",
-      twitch:"Twitch", website:"Website", email:"E-posta", phone:"Telefon"
+      twitch:"Twitch", website:"Website", email: isEN ? "Email" : "E-posta",
+      phone: isEN ? "Phone" : "Telefon"
     };
 
     function handleOf(v){ return (v||"").replace(/^[@\s]+|[@\s]+$/g, ""); }
@@ -164,11 +186,12 @@
     }
 
     function downloadBtn() {
-      return '<a class="cta" href="' + APP_STORE_URL + '">Pingo\'yu App Store\'dan indir</a>';
+      return '<a class="cta" href="' + APP_STORE_URL + '">' + T.download + '</a>';
     }
 
     function renderCard(card) {
       var kind = KIND[card.kind] || KIND.social;
+      var kindName = isEN ? kind.en : kind.tr;
       var bg = card.cardColorHex
         ? "linear-gradient(135deg," + card.cardColorHex + "," + card.cardColorHex + ")"
         : "linear-gradient(135deg," + kind.grad[0] + "," + kind.grad[1] + ")";
@@ -177,25 +200,28 @@
       var links = accounts.map(function (a) {
         var name = PLAT_NAME[a.platform] || a.platform;
         return '<a class="link" href="' + esc(urlFor(a.platform, a.value)) + '" target="_blank" rel="noopener">' +
-               '<span class="plat">' + esc(name) + '</span>' +
+               '<span class="col"><span class="plat">' + esc(name) + '</span>' +
+               (a.subtitle ? '<span class="sub">' + esc(a.subtitle) + '</span>' : '') + '</span>' +
                '<span class="val">' + esc(a.value) + '</span></a>';
       }).join("");
+
+      if (card.name) document.title = card.name + " · Pingo";
 
       document.getElementById("root").innerHTML =
         '<div class="card" style="background:' + bg + '">' +
           '<div class="avatar">' + esc(initials(card.name)) + '</div>' +
           '<div class="name">' + esc(card.name || "Pingo") + '</div>' +
           (card.title ? '<div class="title">' + esc(card.title) + '</div>' : '') +
-          '<div class="pill">' + kind.emoji + ' ' + esc(kind.name) + '</div>' +
+          '<div class="pill">' + kind.emoji + ' ' + esc(kindName) + '</div>' +
           '<div class="links">' + links + '</div>' +
         '</div>' +
         downloadBtn() +
-        '<div class="foot">Made with Pingo</div>';
+        '<div class="foot">' + T.made + '</div>';
     }
 
     function renderMissing() {
       document.getElementById("root").innerHTML =
-        '<div class="state"><div class="big">🔍</div>Bu kart bulunamadı veya artık paylaşılmıyor.</div>' +
+        '<div class="state"><div class="big">🔍</div>' + T.missing + '</div>' +
         downloadBtn();
     }
 
