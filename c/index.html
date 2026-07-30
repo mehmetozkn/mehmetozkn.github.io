@@ -327,9 +327,10 @@
     function docURL(id) {
       bust++;
       // Cache-bust: Safari'nin sakladığı ESKİ 404 yanıtı bir daha kullanılmasın.
+      // Hem timestamp hem de random değer eklenerek her istek benzersiz olur.
       return "https://firestore.googleapis.com/v1/projects/" + FIREBASE_PROJECT_ID +
              "/databases/(default)/documents/sharedCards/" + encodeURIComponent(id) +
-             "?_=" + bust + "." + (new Date()).getTime();
+             "?_=" + bust + "." + (new Date()).getTime() + "." + Math.random().toString(36).substr(2, 9);
     }
 
     function wait(ms) {
@@ -344,7 +345,16 @@
       function once() {
         attempt++;
         // no-store: hem eski 404'ü yok sayar hem de yanıtı önbelleğe yazmaz.
-        return fetch(docURL(id), { cache: "no-store", credentials: "omit" })
+        // reload: tarayıcıyı önbelleği tamamen atlamaya zorlar.
+        return fetch(docURL(id), { 
+          cache: "reload", 
+          credentials: "omit",
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        })
           .then(function (r) {
             if (r.status === 404) return { status: "notfound", detail: "HTTP 404 (" + id + ")" };
             if (!r.ok) {
