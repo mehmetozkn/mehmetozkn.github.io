@@ -345,16 +345,7 @@
       function once() {
         attempt++;
         // no-store: hem eski 404'ü yok sayar hem de yanıtı önbelleğe yazmaz.
-        // reload: tarayıcıyı önbelleği tamamen atlamaya zorlar.
-        return fetch(docURL(id), { 
-          cache: "reload", 
-          credentials: "omit",
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        })
+        return fetch(docURL(id), { cache: "no-store", credentials: "omit" })
           .then(function (r) {
             if (r.status === 404) return { status: "notfound", detail: "HTTP 404 (" + id + ")" };
             if (!r.ok) {
