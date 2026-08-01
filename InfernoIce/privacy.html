@@ -73,13 +73,22 @@
     <h2>1. Screen Time & Family Controls Data</h2>
     <p>The core functionality of the App relies on Apple's Screen Time frameworks: <strong>FamilyControls</strong>, <strong>ManagedSettings</strong> and <strong>DeviceActivity</strong>. When you grant Screen Time authorization, the following applies:</p>
     <ul>
-        <li><strong>Opaque App Tokens:</strong> When you pick apps to freeze (Ice Shield / Detox Mode), iOS gives us only opaque, non-readable tokens. We <strong>cannot</strong> see the names, icons, or content of the apps you select.</li>
-        <li><strong>No Content Access:</strong> The App never reads, records, or transmits anything inside your other apps: no messages, no browsing history, no screenshots, no keystrokes.</li>
+        <li><strong>Anonymised Application Tokens:</strong> When you pick apps to freeze (Ice Shield / Detox Mode), Apple's privacy protocols mean iOS hands us only opaque, non-readable identifiers (<code>ApplicationToken</code>) that are processed <strong>on your device only</strong>. We <strong>cannot</strong> see the names or icons of the apps you select.</li>
+        <li><strong>No Content Access:</strong> The App can never see, record, or transmit to our servers the contents of your other apps, your conversations and messages, or your in-app activity. No browsing history, no screenshots, no keystrokes.</li>
         <li><strong>No Cloud Uploads:</strong> Your app selections, block schedules, and usage statistics are stored locally on your device and, where applicable, in an app group container shared only with our own app extensions. This data is <strong>never</strong> uploaded to our servers.</li>
         <li><strong>Apple's Protection:</strong> Screen Time data is protected by iOS at the operating system level and is not accessible to us outside the sandbox Apple defines.</li>
     </ul>
 
-    <h2>2. Data Stored on Your Device</h2>
+    <h2>2. Personal Data We Do Not Collect</h2>
+    <p>The App does not require an account and does not ask you to identify yourself.</p>
+    <ul>
+        <li><strong>No Personal Identifiers:</strong> We do not collect your name, surname, e-mail address, phone number, or any similar personal identity information.</li>
+        <li><strong>No Location Data:</strong> The App does not request or collect location data.</li>
+        <li><strong>Never Sold or Shared:</strong> We do not sell, rent, or share personal data with third parties for any purpose, including advertising.</li>
+        <li><strong>What Is Actually Collected:</strong> The data involved is limited to on-device usage statistics (such as block duration and the number of times you resisted opening an app) and anonymous in-app purchase / crystal balance records.</li>
+    </ul>
+
+    <h2>3. Data Stored on Your Device</h2>
     <p>To make the gamification work, the App keeps a small amount of state locally:</p>
     <ul>
         <li><strong>Block Profiles:</strong> The groups of apps you chose to restrict, along with their schedules and friction settings.</li>
@@ -89,25 +98,30 @@
     </ul>
     <p>All of the above is written to local storage on your device. Deleting the App removes this data.</p>
 
-    <h2>3. Notifications & Live Activities</h2>
+    <h2>4. Notifications & Live Activities</h2>
     <p>With your permission, the App shows local notifications, Live Activities, and Dynamic Island updates so you can track an active detox session. These are generated on your device. We do not operate a push server that receives your session details.</p>
 
-    <h2>4. Purchases</h2>
-    <p>The App offers consumable in-app purchases (Ice Crystal packs) and an optional subscription (InfernoIce Pro). All payments are processed by <strong>Apple</strong> through the App Store. We never see or store your payment card details, and we do not receive your Apple ID credentials. Purchase validation is handled through Apple's StoreKit.</p>
-
-    <h2>5. Third-Party Services</h2>
-    <p>We do not use any third-party advertising services and we do not sell or share your personal data. We may use limited analytics services solely to keep the App stable:</p>
+    <h2>5. Subscriptions & Payment Information</h2>
+    <p>The App offers consumable in-app purchases (Ice Crystal packs) and an optional subscription (InfernoIce Pro).</p>
     <ul>
+        <li><strong>Processed by Apple:</strong> All payment transactions take place directly through the <strong>Apple App Store (StoreKit)</strong> infrastructure.</li>
+        <li><strong>No Payment Details:</strong> Your credit card, billing, and payment information is processed solely by Apple. InfernoIce cannot access or store this information, and we do not receive your Apple ID credentials.</li>
+    </ul>
+
+    <h2>6. Third-Party Services</h2>
+    <p>We do not use any third-party advertising services and we do not sell or share your personal data. We use a limited number of services strictly for purchase validation and app stability:</p>
+    <ul>
+        <li><strong>Purchase Validation (e.g. RevenueCat):</strong> Secure infrastructure may be used to verify your subscription status and in-app purchases (Ice Crystals). In this process only anonymous user identifiers (App User ID) that contain no personal data are used.</li>
         <li><strong>Firebase (Google):</strong> Used strictly for crash reporting (Crashlytics) and anonymous, aggregated usage analytics that help us find and fix bugs. This service <strong>does not have access</strong> to your Screen Time data, your selected apps, or your block profiles.</li>
     </ul>
 
-    <h2>6. Data Security</h2>
+    <h2>7. Data Security</h2>
     <p>Because your app selections, statistics, and progress remain on your device, they are protected by the standard security protocols of the iOS operating system, including app sandboxing and device-level encryption.</p>
 
-    <h2>7. Children's Privacy</h2>
+    <h2>8. Children's Privacy</h2>
     <p>The App does not knowingly collect personal information from children under the age of 13. Given our on-device approach, no child's usage data is collected or transmitted by us.</p>
 
-    <h2>8. Your Rights & Control</h2>
+    <h2>9. Your Rights & Control</h2>
     <p>You are always in control:</p>
     <ul>
         <li>You may revoke Screen Time authorization at any time from iOS Settings, which immediately stops all blocking.</li>
@@ -115,10 +129,10 @@
         <li>Deleting the App removes all locally stored InfernoIce data from your device.</li>
     </ul>
 
-    <h2>9. Changes to This Policy</h2>
+    <h2>10. Changes to This Policy</h2>
     <p>We may update our Privacy Policy from time to time. You are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
 
-    <h2>10. Contact Us</h2>
+    <h2>11. Contact Us</h2>
     <p>If you have any questions regarding this Privacy Policy, please contact us at:</p>
     <div class="contact-info">
         <strong>Email:</strong> <a href="mailto:ozkan6624@gmail.com">ozkan6624@gmail.com</a>
