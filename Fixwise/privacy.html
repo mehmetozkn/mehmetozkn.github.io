@@ -106,11 +106,13 @@
     <h2>5. Personal Data We Do Not Collect</h2>
     <p>The App never asks you to sign up or log in. The anonymous account described in Section 3 is created automatically and contains no personal details.</p>
     <ul>
-        <li><strong>No Personal Identifiers:</strong> We do not ask for your name, e-mail address, phone number, or home address.</li>
+        <li><strong>No Personal Identifiers by Default:</strong> We do not ask for your name, phone number, or home address. Your e-mail address is collected only if you choose Sign in with Apple (see below).</li>
         <li><strong>No Location Tracking:</strong> We do not collect GPS or precise location data. When you tap "Find a pro", the App opens Apple Maps with a search such as "electrician near me". That search is handled by Apple under its own privacy policy.</li>
         <li><strong>No Advertising:</strong> The App contains no third-party advertising and does not track you across other companies' apps or websites.</li>
         <li><strong>Never Sold:</strong> We do not sell or rent personal information.</li>
     </ul>
+
+    <p><strong>Sign in with Apple (optional):</strong> If you choose to sign in, your anonymous account is linked to your Apple ID so your repair history is kept when you reinstall or change phones. Apple shares with us a stable account identifier and an e-mail address, which can be a private relay address if you choose "Hide My Email". We use them only to sign you in and never for marketing. You can sign out or delete your account at any time in Profile → Account; deleting the account removes your repair history and maintenance progress from our database and revokes the App's access to your Apple ID.</p>
 
     <h2>6. Subscriptions & Payment Information</h2>
     <p>The App offers an optional auto-renewing subscription (Fixwise Premium).</p>
@@ -125,7 +127,7 @@
         <li><strong>Google Gemini via Firebase AI Logic:</strong> Generates diagnoses from the content described in Section 1.</li>
         <li><strong>Firebase App Check (with Apple App Attest):</strong> Confirms that requests come from the genuine App on a real device, so the AI service cannot be abused. It uses device attestation, not personal information.</li>
         <li><strong>Firebase Analytics, Crashlytics & Performance Monitoring (Google):</strong> Help us understand how the App is used and find and fix bugs. They record usage events (for example, screens viewed, the category and urgency of a diagnosis, whether a purchase was started), crash reports, and performance data, along with a random app instance identifier and general device information. They <strong>do not</strong> receive your photos, your descriptions, or the contents of your repairs.</li>
-        <li><strong>Firebase Authentication & Cloud Firestore (Google):</strong> Create the anonymous account and store your repair history (Section 3).</li>
+        <li><strong>Firebase Authentication & Cloud Firestore (Google):</strong> Create your anonymous account (or your Sign in with Apple account) and store your repair history (Section 3).</li>
         <li><strong>RevenueCat:</strong> Verifies your subscription status. It uses an anonymous App User ID and your App Store purchase records. We also share the anonymous Firebase app instance identifier with RevenueCat so subscription events can be measured in our analytics.</li>
     </ul>
 
