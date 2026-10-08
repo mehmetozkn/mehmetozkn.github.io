@@ -71,13 +71,15 @@
     <p><strong>Fixwise</strong> ("the App") is an AI home repair assistant. You take a photo of a problem in your home or describe it, and the App tells you what is likely wrong, how urgent it is, what a professional would charge, and whether it is safe to fix it yourself. This Privacy Policy explains what data the App uses to do that, where it goes, and how you stay in control.</p>
 
     <h2>1. Photos & Descriptions You Submit</h2>
-    <p>Diagnosis is the core of the App, and it is the only time your content leaves your device:</p>
+    <p>Diagnosis is the core of the App. When you ask for one:</p>
     <ul>
         <li><strong>What Is Sent:</strong> When you ask for a diagnosis, the photos you chose (up to three, resized to a maximum of 1024 pixels), the text you typed, your answers to any follow-up questions, and the room and timing you selected are sent to an AI model to generate the answer.</li>
         <li><strong>Who Processes It:</strong> Requests are processed by <strong>Google's Gemini models through Firebase AI Logic</strong>. Google processes this content to return the diagnosis, under the <a href="https://ai.google.dev/gemini-api/terms" target="_blank">Gemini API Additional Terms of Service</a> and the <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.</li>
-        <li><strong>No Server of Our Own:</strong> We do not operate a server that receives or stores your photos or descriptions. We do not use them to train our own models, and we do not sell them.</li>
+        <li><strong>Photos Stay With You:</strong> We do not store your photos on any server. Your description and the resulting diagnosis are saved to your repair history (Section 3). We do not use your content to train our own models, and we do not sell it.</li>
         <li><strong>Only What You Choose:</strong> The App only sends photos you take or pick yourself. Please avoid including people, documents, or other personal information in the frame. The App is designed for photos of fixtures, appliances, walls, and other parts of your home.</li>
     </ul>
+
+    <p>The same applies when you ask a question in <strong>"Ask Fixwise"</strong> (the in-repair chat): your question, any photo you attach, the recent conversation, and the details of that repair are sent to Google's Gemini models to generate the answer.</p>
 
     <h2>2. Your Home Profile</h2>
     <p>During onboarding you may tell us your home type (house, apartment, townhouse), whether you own or rent, your DIY experience level, and the areas you are interested in. These answers personalize the advice. For example, renters are reminded to check with their landlord.</p>
@@ -86,19 +88,23 @@
         <li>It is included in diagnosis requests (Section 1) so the answer fits your situation. Your device's language and region settings are also included so the answer uses your language, units, and typical local costs. The App does <strong>not</strong> use GPS or your precise location.</li>
     </ul>
 
-    <h2>3. Data Stored on Your Device</h2>
+    <h2>3. Your Repair History</h2>
+    <p>So you can come back to a repair, the App keeps a history of your repairs.</p>
     <ul>
-        <li><strong>Repair History:</strong> Each diagnosis you receive, the first photo of it, your notes, and its status (diagnosed, in progress, fixed, hired a pro).</li>
-        <li><strong>Savings Tracker:</strong> Estimated amounts you saved by fixing things yourself.</li>
-        <li><strong>App Settings:</strong> Your home profile, onboarding progress, and the number of free diagnoses used today.</li>
+        <li><strong>What Is Saved:</strong> For each repair: the diagnosis, your description and the room you selected, the repair guide, your progress through the steps, the tools you marked as owned, the result ("fixed", "not fixed", "hired a pro"), your estimated savings, and the text of your "Ask Fixwise" conversation about it.</li>
+        <li><strong>Maintenance:</strong> When you last completed each maintenance task in the Maintain tab, and whether maintenance reminders are on.</li>
+        <li><strong>Where:</strong> This history is stored in <strong>Google Cloud Firestore</strong> (part of Firebase), linked to an <strong>anonymous account</strong> that the App creates automatically. The anonymous account has no name, e-mail, or password. Security rules allow only that account to read or change its repairs.</li>
+        <li><strong>Photos:</strong> The photo of each repair is kept <strong>only on your device</strong> and is never uploaded to our database. For photos attached in "Ask Fixwise", we keep only a note that a photo was sent, not the photo.</li>
+        <li><strong>On Your Device:</strong> Your home profile, onboarding progress, and the number of free diagnoses used today are stored only on your device.</li>
     </ul>
-    <p>This data is kept in the App's local storage and is not uploaded to our servers. You can delete individual repairs in the App, and deleting the App removes all of this data from your device.</p>
+    <p>You can delete a single repair, or your entire repair history, in the App (Section 11).</p>
 
     <h2>4. Camera & Photo Library</h2>
-    <p>Camera access is used only when you choose to photograph a problem. When you pick from your photo library, the App receives only the photos you select; it cannot browse the rest of your library. Photos are used for the diagnosis (Section 1) and your repair history (Section 3) only.</p>
+    <p>Camera access is used only when you choose to photograph a problem or attach a photo to a question. When you pick from your photo library, the App receives only the photos you select; it cannot browse the rest of your library. Photos are used for the diagnosis (Section 1) and your repair history (Section 3) only.</p>
+    <p><strong>Notifications:</strong> If you allow notifications, the App schedules reminders on your device (for example "Did your fix work?" or a maintenance task due today). They are created locally; we do not run a push server and no reminder content is sent to us.</p>
 
     <h2>5. Personal Data We Do Not Collect</h2>
-    <p>The App does not require an account.</p>
+    <p>The App never asks you to sign up or log in. The anonymous account described in Section 3 is created automatically and contains no personal details.</p>
     <ul>
         <li><strong>No Personal Identifiers:</strong> We do not ask for your name, e-mail address, phone number, or home address.</li>
         <li><strong>No Location Tracking:</strong> We do not collect GPS or precise location data. When you tap "Find a pro", the App opens Apple Maps with a search such as "electrician near me". That search is handled by Apple under its own privacy policy.</li>
@@ -118,19 +124,21 @@
     <ul>
         <li><strong>Google Gemini via Firebase AI Logic:</strong> Generates diagnoses from the content described in Section 1.</li>
         <li><strong>Firebase App Check (with Apple App Attest):</strong> Confirms that requests come from the genuine App on a real device, so the AI service cannot be abused. It uses device attestation, not personal information.</li>
-        <li><strong>Firebase Analytics, Crashlytics & Performance Monitoring (Google):</strong> Help us understand how the App is used and find and fix bugs. They record usage events (for example, screens viewed, the category and urgency of a diagnosis, whether a purchase was started), crash reports, and performance data, along with a random app instance identifier and general device information. They <strong>do not</strong> receive your photos, your descriptions, or your repair history.</li>
+        <li><strong>Firebase Analytics, Crashlytics & Performance Monitoring (Google):</strong> Help us understand how the App is used and find and fix bugs. They record usage events (for example, screens viewed, the category and urgency of a diagnosis, whether a purchase was started), crash reports, and performance data, along with a random app instance identifier and general device information. They <strong>do not</strong> receive your photos, your descriptions, or the contents of your repairs.</li>
+        <li><strong>Firebase Authentication & Cloud Firestore (Google):</strong> Create the anonymous account and store your repair history (Section 3).</li>
         <li><strong>RevenueCat:</strong> Verifies your subscription status. It uses an anonymous App User ID and your App Store purchase records. We also share the anonymous Firebase app instance identifier with RevenueCat so subscription events can be measured in our analytics.</li>
     </ul>
 
     <h2>8. Data Retention</h2>
     <ul>
+        <li>Your repair history is kept until you delete it in the App. Deleting the App does not delete it from our database, but without your anonymous account it can no longer be opened; you can ask us to delete it (Section 11).</li>
         <li>Data on your device is kept until you delete it or delete the App.</li>
         <li>Analytics data is kept for a limited period, no longer than 14 months.</li>
         <li>Diagnosis requests sent to Google are kept according to Google's terms for the Gemini API (Section 1).</li>
     </ul>
 
     <h2>9. Data Security</h2>
-    <p>Diagnosis requests are sent over encrypted connections (HTTPS). Data on your device is protected by iOS app sandboxing and device-level encryption. We recommend protecting your device with a passcode or biometric lock.</p>
+    <p>Diagnosis requests and repair history are sent over encrypted connections (HTTPS) and encrypted at rest by Google Cloud. Data on your device is protected by iOS app sandboxing and device-level encryption. We recommend protecting your device with a passcode or biometric lock.</p>
 
     <h2>10. Children's Privacy</h2>
     <p>The App is not directed at children under the age of 13, and we do not knowingly collect personal information from them. If you believe a child has submitted information through the App, please contact us and we will help remove it.</p>
@@ -139,8 +147,9 @@
     <p>You are always in control:</p>
     <ul>
         <li>You can revoke camera or photo access at any time in iOS Settings.</li>
-        <li>You can edit your home profile and delete repairs inside the App.</li>
-        <li>Deleting the App removes all locally stored Fixwise data from your device.</li>
+        <li>You can edit your home profile and delete individual repairs inside the App.</li>
+        <li>You can delete your entire repair history, from our database and your device, in Profile → "Delete my repair history".</li>
+        <li>Deleting the App removes all locally stored Fixwise data, including photos, from your device.</li>
         <li>Depending on where you live (for example, California or the European Union), you may have the right to access, correct, or delete personal information associated with your app instance identifier, or to object to its processing. To make a request, contact us at the e-mail address below.</li>
     </ul>
 
