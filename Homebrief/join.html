@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join a family - Homebrief</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        a {
+            text-decoration: none;
+            color: #C63F29;
+            font-weight: 600;
+            border: 2px solid #C63F29;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        a:hover {
+            background-color: #C63F29;
+            color: white;
+        }
+        a.support {
+            border-color: #8e8e93;
+            color: #8e8e93;
+        }
+        a.support:hover {
+            background-color: #8e8e93;
+            color: white;
+        }
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Join a family on Homebrief</h1>
+        <p>Someone invited you to share their family's week: school deadlines, payments, events and what to pack.</p>
+        <p id="code-line" style="display:none">Your invite code: <strong id="code" style="font-family: ui-monospace, Menlo, monospace; font-size: 1.4em; letter-spacing: 0.1em"></strong></p>
+        <div class="links">
+            <a href="https://apps.apple.com/app/id6822728788">Get Homebrief on the App Store</a>
+        </div>
+        <p>After installing, open this link again, or go to Settings › Family › Enter a code.</p>
+        <div class="footer">&copy; 2026 Homebrief. <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+    </div>
+    <script>
+        const code = new URLSearchParams(location.search).get("c");
+        if (code && /^[A-Z0-9]{6}$/.test(code.toUpperCase())) {
+            const c = code.toUpperCase();
+            document.getElementById("code").textContent = c.slice(0, 3) + "-" + c.slice(3);
+            document.getElementById("code-line").style.display = "block";
+        }
+    </script>
+</body>
+</html>

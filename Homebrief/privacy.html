@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Homebrief</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #C63F29;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 30px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        ul {
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .contact-info {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Homebrief Privacy Policy</h1>
+
+    <p>Last Updated: October 2026</p>
+
+    <p><strong>Homebrief</strong> ("the App") is a family organizer for parents. You share a school message, a letter, a PDF, a photo of a flyer or a group-chat export, and the App finds the dates, deadlines, payments and things to pack in it, turns them into tasks for your family, and reminds you. This Privacy Policy explains what data the App uses to do that, where it goes, and how you stay in control.</p>
+
+    <h2>1. Content You Share to Be Read</h2>
+    <p>Reading what you share is the core of the App. Nothing is read unless you share it or pick it yourself.</p>
+    <ul>
+        <li><strong>What Is Sent:</strong> When you ask the App to read something, it prepares it on your device and sends it to an AI model: the text of a PDF (or, for scanned PDFs, images of up to 10 pages), photos you picked or scanned (resized to at most 2000 pixels), text you pasted, or the recent messages of an exported group chat. Together with it, the App sends the first names or nicknames, classes and schools of the children you added, your app language and region, and today's date, so the AI can match tasks to the right child and read dates correctly.</li>
+        <li><strong>Group Chats Are Cleaned First:</strong> Before a chat export is sent, the App keeps only the last days you chose, removes greetings and media placeholders, replaces every sender's name with a label such as "P1", and removes phone numbers and e-mail addresses. Sender names and numbers never leave your device.</li>
+        <li><strong>Who Processes It:</strong> Content is processed by Google's Gemini models through Firebase AI Logic, using the Gemini Developer API. <strong>Google may use content sent through this service, and the answers, to provide, improve and develop its products and services, and human reviewers may read it</strong>, under the <a href="https://ai.google.dev/gemini-api/terms">Gemini API Additional Terms of Service</a> and the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>. The App asks for your OK before the first time anything is sent. Please don't share documents that contain information you don't want to send, such as medical, financial or identity documents.</li>
+        <li><strong>Files Are Not Kept:</strong> We do not store your files, photos or chat exports on any server. The App keeps only the tasks found in them and a short quote (at most 200 characters, without names) that shows where each task came from. Content that couldn't be read yet (for example because of the monthly limit or no connection) waits in the App's Inbox on your device for up to 30 days and is then deleted.</li>
+    </ul>
+
+    <h2>2. Your Family's Tasks</h2>
+    <ul>
+        <li><strong>What Is Saved:</strong> Each task's type, title, date and time, place, amount and currency, the children it concerns, who handles it, whether it is done, its short source quote and your note; the list of things you shared (type, file or group name, date, number of tasks found, but not the content); the names of WhatsApp groups you linked to a child; and the children's first names or nicknames, classes, schools and colors that you entered.</li>
+        <li><strong>Where:</strong> This data is stored on your device and in Google Cloud Firestore (part of Firebase, data center in the United States), in a family space that only the adults in your family can read. A monthly count of AI reads is stored there too, to apply the free limit.</li>
+        <li><strong>We Do Not Collect About Children:</strong> Children do not use the App. We do not ask for children's last names, birthdays, photos, locations or any contact details. Only what a parent chooses to enter is stored.</li>
+    </ul>
+
+    <h2>3. Your Account</h2>
+    <p>The App never asks you to sign up. On first launch it creates an anonymous account automatically; it has no name, e-mail or password.</p>
+    <ul>
+        <li><strong>Your Name (optional):</strong> When you invite your partner, you can add your first name so they see who assigned what.</li>
+        <li><strong>Sign in with Apple (optional):</strong> If you choose it, your anonymous account is linked to your Apple ID so your family is kept when you change phones. Apple shares a stable account identifier and, if you allow it, your name and an e-mail address (which can be a private relay address). We use them only to sign you in and never for marketing.</li>
+        <li><strong>Deleting Your Account:</strong> Settings → Delete account removes your account and, if you are the only adult in the family, the whole family space (children, tasks and history) from our database, deletes the App's data on your device, and revokes the App's access to your Apple ID.</li>
+    </ul>
+
+    <h2>4. Sharing With Your Partner</h2>
+    <p>If you invite another adult with an invite code or link, and they join, you both see and edit the same family space: children, tasks, who handles what and the history of shared items. An invite code is valid for 7 days and shows your first name, if you added one, to the person who uses it. Either of you can leave the family at any time; tasks assigned to the person who leaves become unassigned. The family owner can remove the other adult.</p>
+
+    <h2>5. Notifications, Calendar, Camera & Widgets</h2>
+    <ul>
+        <li><strong>Notifications:</strong> Reminders (the evening before a deadline, the morning list, the weekly brief) are created on your device. We do not run a push server and no reminder content is sent to us.</li>
+        <li><strong>Calendar:</strong> If you tap "Add to Calendar" (or turn on automatic adding with Pro), the App asks for write-only access and adds the event to your calendar. It cannot read your calendar.</li>
+        <li><strong>Camera & Photos:</strong> The camera is used only when you scan a letter. When you pick photos, the App receives only the photos you select.</li>
+        <li><strong>Share Extension & Widgets:</strong> Content you share to Homebrief from another app is saved in the App's private storage on your device until the App reads it. Widgets show your upcoming tasks from a summary stored on your device.</li>
+    </ul>
+
+    <h2>6. Personal Data We Do Not Collect</h2>
+    <ul>
+        <li><strong>No Location:</strong> We do not collect GPS or precise location.</li>
+        <li><strong>No Contacts or Chats:</strong> The App cannot read your WhatsApp or other chats. It only receives what you share or export yourself.</li>
+        <li><strong>No Advertising:</strong> The App contains no third-party advertising and does not track you across other companies' apps or websites.</li>
+        <li><strong>Never Sold:</strong> We do not sell or rent personal information.</li>
+    </ul>
+
+    <h2>7. Analytics & Crash Reports</h2>
+    <p>Firebase Analytics and Crashlytics help us understand how the App is used and fix bugs. They record usage events (for example screens viewed, how many tasks were found in a capture, whether a reminder was opened, whether a purchase was started), crash reports, a random app instance identifier and general device information. They never receive the content you share, task titles, quotes, children's or adults' names, group or file names, or amounts.</p>
+
+    <h2>8. Subscriptions & Payment Information</h2>
+    <p>The App offers an optional subscription (Homebrief Pro) and a one-time lifetime purchase. All payments take place through the Apple App Store; your card and billing details are handled solely by Apple and we never see them. One purchase covers the adults in a family: the family's anonymous identifier is used to share it.</p>
+
+    <h2>9. Third-Party Services</h2>
+    <ul>
+        <li><strong>Google Gemini via Firebase AI Logic:</strong> Reads the content you share (Section 1).</li>
+        <li><strong>Firebase Authentication & Cloud Firestore (Google):</strong> Your anonymous or Apple account and your family space (Sections 2–4).</li>
+        <li><strong>Firebase App Check (with Apple App Attest):</strong> Confirms that requests come from the genuine App on a real device, so the AI service can't be abused. It uses device attestation, not personal information.</li>
+        <li><strong>Firebase Remote Config:</strong> Delivers settings such as the free monthly limit without an app update.</li>
+        <li><strong>Firebase Analytics & Crashlytics (Google):</strong> Usage events and crash reports (Section 7).</li>
+        <li><strong>RevenueCat:</strong> Verifies your subscription or purchase, using an anonymous family identifier and your App Store purchase records. The anonymous Firebase app instance identifier is shared with RevenueCat so subscription events can be measured.</li>
+    </ul>
+
+    <h2>10. Data Retention</h2>
+    <ul>
+        <li>Your family's tasks, children and history are kept until you delete them, leave the family as its last adult, or delete your account.</li>
+        <li>Content waiting in the Inbox stays on your device for at most 30 days.</li>
+        <li>Data on your device is kept until you delete it or delete the App.</li>
+        <li>Analytics data is kept for a limited period, no longer than 14 months.</li>
+        <li>Content sent to Google for reading is kept according to Google's terms for the Gemini API (Section 1).</li>
+    </ul>
+
+    <h2>11. Data Security</h2>
+    <p>Content and family data travel over encrypted connections (HTTPS) and are encrypted at rest by Google Cloud. Security rules let only the adults of a family read or change its data. Data on your device is protected by iOS app sandboxing and device encryption. We recommend protecting your device with a passcode or biometric lock.</p>
+
+    <h2>12. Children's Privacy</h2>
+    <p>The App is meant for parents and other adults who care for children, and is not directed at anyone under 18. Children do not create accounts or use the App. Information about children (a first name or nickname, class and school) is entered by a parent to organize the family's tasks, and a parent can edit or delete it at any time in Settings → Kids. If you believe a child has used the App, please contact us and we will help remove the data.</p>
+
+    <h2>13. Your Rights & Control</h2>
+    <ul>
+        <li>You can edit or delete any task, child or shared item in the App, and delete your whole account in Settings → Delete account.</li>
+        <li>You can turn off notifications, calendar and camera access at any time in iOS Settings.</li>
+        <li>Deleting the App removes all locally stored Homebrief data, including content waiting in the Inbox, from your device.</li>
+        <li>Your data is processed in the United States by Google and RevenueCat. Depending on where you live (for example Türkiye under KVKK, Brazil under LGPD, Mexico, or California), you may have the right to access, correct, delete or transfer your personal data, or to object to its processing. To make a request, contact us at the e-mail address below.</li>
+    </ul>
+
+    <h2>14. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time, for example when the App adds a feature that uses data differently. We will post the new version on this page and update the date above.</p>
+
+    <h2>15. Contact Us</h2>
+    <p>If you have any questions regarding this Privacy Policy, please contact us at:</p>
+    <div class="contact-info">
+        <strong>Email:</strong> <a href="mailto:ozkan6624@gmail.com">ozkan6624@gmail.com</a>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Homebrief. All rights reserved.
+</footer>
+
+</body>
+</html>
